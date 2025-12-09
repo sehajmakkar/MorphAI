@@ -284,11 +284,204 @@ This should return the most similar text chunks.
 - [ ] Embeddings are created in database
 - [ ] Vector search function works
 
+## Phase 2: Meeting UI Testing
+
+### Prerequisites for Phase 2
+
+- Phase 1 must be completed and working
+- A modern browser with Web Speech API support (Chrome, Edge, or Safari recommended)
+- Microphone access permissions enabled
+- HTTPS connection (required for microphone access in production; localhost works for development)
+
+### Test 1: Access Meeting Interface
+
+1. **Navigate to Meeting**:
+   - Sign in to your account
+   - Go to a project → room
+   - Click "Start Meeting" button
+   - You should see the dual-screen meeting interface
+
+2. **Verify Layout**:
+   - **Left Panel**: Should show "Developer View" with conversation area
+   - **Right Panel**: Should show "AI Manager" with avatar and response area
+   - **Right Sidebar**: Should show "Meeting Notes" with Decisions and Tasks sections
+   - **Bottom**: Should show voice controls with microphone button
+
+### Test 2: Voice Controls
+
+1. **Microphone Button**:
+   - Click the microphone button at the bottom
+   - Browser should prompt for microphone permission
+   - Click "Allow" when prompted
+   - Button should turn red and show "Listening..." status
+   - Visual indicator should show animated pulse
+
+2. **Speech Recognition**:
+   - With microphone on, speak clearly: "Hello, this is a test"
+   - Wait a few seconds
+   - Your speech should appear as a message in the Developer View (left panel)
+   - Message should be in a blue/indigo bubble on the right side
+
+3. **Stop Listening**:
+   - Click the microphone button again
+   - Button should return to indigo color
+   - Status should show "Microphone off"
+   - Animation should stop
+
+4. **Error Handling**:
+   - If microphone is denied, you should see an error message
+   - If browser doesn't support speech recognition, you should see a warning
+   - Try speaking when microphone is off - nothing should happen
+
+### Test 3: AI Voice Output
+
+1. **AI Response Display**:
+   - After speaking, wait for AI response (currently placeholder)
+   - AI response should appear in the AI Manager panel (right side)
+   - Response should be in a white card/bubble
+
+2. **Text-to-Speech**:
+   - When AI responds, you should hear the text being spoken
+   - Visual waveform animation should appear during speech
+   - Speech should use a natural-sounding voice
+
+3. **Multiple Responses**:
+   - Speak multiple times
+   - Each response should be spoken in sequence
+   - Previous responses should remain visible in the conversation
+
+### Test 4: Meeting Sidebar
+
+1. **Decisions Section**:
+   - Currently empty (will be populated in Phase 3)
+   - Should show "No decisions yet" message
+   - Section should have a green indicator dot
+
+2. **Tasks Section**:
+   - Currently empty (will be populated in Phase 4)
+   - Should show "No tasks yet" message
+   - Section should have a blue indicator dot
+
+3. **Real-time Updates**:
+   - Sidebar is set up for real-time updates via Supabase Realtime
+   - Will be tested when Phase 3 and 4 add actual data
+
+### Test 5: Conversation Flow
+
+1. **Multiple Messages**:
+   - Speak several messages in sequence
+   - Each message should appear in chronological order
+   - Timestamps should be displayed for each message
+   - Conversation should scroll automatically
+
+2. **Message Persistence**:
+   - Refresh the page
+   - Previous messages should be loaded from database
+   - Conversation history should be preserved
+
+3. **Message Roles**:
+   - User messages should appear on the right (blue/indigo)
+   - AI messages should appear on the left (white/gray)
+   - Roles should be clearly distinguishable
+
+### Test 6: Browser Compatibility
+
+1. **Chrome/Edge**:
+   - Full support expected
+   - Speech recognition should work immediately
+   - Text-to-speech should work
+
+2. **Safari**:
+   - Should work but may have slight differences
+   - May require additional permissions
+
+3. **Firefox**:
+   - Speech recognition may not work (not fully supported)
+   - Text-to-speech should still work
+   - You should see a warning message
+
+### Test 7: Responsive Design
+
+1. **Window Resize**:
+   - Resize browser window
+   - Layout should adapt appropriately
+   - Sidebar may collapse on smaller screens
+   - Voice controls should remain accessible
+
+2. **Mobile View** (if applicable):
+   - Test on mobile device or mobile view
+   - Layout should stack appropriately
+   - Touch interactions should work
+
+### Troubleshooting Phase 2
+
+#### Issue: Microphone button doesn't work
+
+**Solution**:
+- Check browser console for errors
+- Verify microphone permissions in browser settings
+- Try refreshing the page
+- Ensure you're using Chrome, Edge, or Safari
+- Check if microphone is being used by another application
+
+#### Issue: Speech not being recognized
+
+**Solution**:
+- Speak clearly and wait a few seconds
+- Check microphone volume levels
+- Ensure microphone is not muted
+- Try speaking in a quieter environment
+- Check browser console for recognition errors
+
+#### Issue: No AI voice output
+
+**Solution**:
+- Check browser console for errors
+- Verify text-to-speech is enabled in browser settings
+- Try a different browser
+- Check system volume
+
+#### Issue: Messages not appearing
+
+**Solution**:
+- Check browser console for errors
+- Verify Supabase connection
+- Check network tab for API errors
+- Ensure you're signed in
+
+#### Issue: Sidebar not updating
+
+**Solution**:
+- This is expected in Phase 2 (no data yet)
+- Real-time updates will work in Phase 3 and 4
+- Check Supabase Realtime is enabled in your project
+
+### Phase 2 Verification Checklist
+
+- [ ] Can access meeting interface from room page
+- [ ] Dual-screen layout displays correctly
+- [ ] Microphone button toggles on/off
+- [ ] Browser prompts for microphone permission
+- [ ] Speech is recognized and appears as message
+- [ ] AI responses appear in AI Manager panel
+- [ ] Text-to-speech works for AI responses
+- [ ] Visual indicators show listening/speaking states
+- [ ] Sidebar displays (even if empty)
+- [ ] Messages persist after page refresh
+- [ ] Conversation history loads correctly
+- [ ] Layout is responsive
+
+### Phase 2 Notes
+
+- **Current AI Responses**: Phase 2 uses placeholder responses. Full AI integration will be in Phase 3.
+- **Tasks and Decisions**: These sections are set up but will be populated in later phases.
+- **Real-time Updates**: Infrastructure is in place but will be fully functional in Phase 3 and 4.
+- **Voice Quality**: Depends on browser and system settings. Chrome typically provides the best experience.
+
 ## Next Steps
 
-Once Phase 1 is working correctly, you're ready for:
-- **Phase 2**: Meeting UI with voice controls
-- **Phase 3**: AI conversation loop and summarization
+Once Phase 2 is working correctly, you're ready for:
+- **Phase 3**: AI conversation loop and summarization (full AI integration)
 - **Phase 4**: Task assignment system
 - **Phase 5**: Workflow automation with Kestra
 
