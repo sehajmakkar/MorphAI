@@ -27,6 +27,8 @@ export default function MeetingPage() {
   const [currentAIResponse, setCurrentAIResponse] = useState("");
   const [roomName, setRoomName] = useState("");
   const [loading, setLoading] = useState(true);
+  const [turnCount, setTurnCount] = useState(0);
+  const [isLoadingAI, setIsLoadingAI] = useState(false);
 
   useEffect(() => {
     fetchRoomInfo();
@@ -91,35 +93,82 @@ export default function MeetingPage() {
       });
     }
 
-    // Get AI response (Phase 3 will implement full AI logic)
-    // For now, we'll use a placeholder response
-    const aiResponse = await getAIResponse(text);
+    // Get AI response using real AI integration
+    setIsLoadingAI(true);
+    try {
+      const newTurnCount = turnCount + 1;
+      setTurnCount(newTurnCount);
 
-    // Add AI message to UI
-    const aiMessage: Message = {
-      id: `ai-${Date.now()}`,
-      role: "assistant",
-      content: aiResponse,
-      timestamp: new Date(),
-    };
-    setMessages((prev) => [...prev, aiMessage]);
-    setCurrentAIResponse(""); // Clear after adding to messages
+      const aiResponse = await getAIResponse(text, newTurnCount);
 
-    // Save AI response to database
-    if (user) {
-      await supabase.from("conversations").insert({
-        room_id: roomId,
-        user_id: user.id,
-        message: aiResponse,
+      // Add AI message to UI
+      const aiMessage: Message = {
+        id: `ai-${Date.now()}`,
         role: "assistant",
-      });
+        content: aiResponse,
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, aiMessage]);
+      setCurrentAIResponse(""); // Clear after adding to messages
+
+      // Save AI response to database
+      if (user) {
+        await supabase.from("conversations").insert({
+          room_id: roomId,
+          user_id: user.id,
+          message: aiResponse,
+          role: "assistant",
+        });
+      }
+
+      // Refresh sidebar if summary was created (every 5 turns)
+      if (newTurnCount % 5 === 0) {
+        // Trigger a refresh by updating a timestamp or using a state update
+        // The sidebar will pick up new items via realtime subscriptions
+      }
+    } catch (error: any) {
+      console.error("Error getting AI response:", error);
+      // Show error message to user
+      const errorMessage: Message = {
+        id: `error-${Date.now()}`,
+        role: "assistant",
+        content: `Sorry, I encountered an error: ${error.message}. Please try again.`,
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsLoadingAI(false);
     }
   };
 
-  const getAIResponse = async (userInput: string): Promise<string> => {
-    // Placeholder - Phase 3 will implement full AI integration
-    // For now, return a simple acknowledgment
-    return `I understand you said: "${userInput}". This is a placeholder response. Full AI integration will be implemented in Phase 3.`;
+  const getAIResponse = async (
+    userInput: string,
+    currentTurnCount: number
+  ): Promise<string> => {
+    try {
+      const response = await fetch("/api/ai/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: userInput,
+          roomId: roomId,
+          turnCount: currentTurnCount,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to get AI response");
+      }
+
+      const data = await response.json();
+      return data.response;
+    } catch (error: any) {
+      console.error("Error calling AI API:", error);
+      throw error;
+    }
   };
 
   return (
@@ -149,6 +198,12 @@ export default function MeetingPage() {
                 {isListening ? "Recording" : "Idle"}
               </span>
             </div>
+            {isLoadingAI && (
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-indigo-600 rounded-full animate-pulse"></div>
+                <span className="text-sm text-gray-600">AI thinking...</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
