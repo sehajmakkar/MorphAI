@@ -91,7 +91,9 @@ This creates:
 2. Click **New Policy** → **For full customization**
 3. Create policies for INSERT, SELECT, and DELETE (see SQL file for exact policies)
 
-## Step 3: Get Google Gemini API Key
+## Step 3: Get API Keys
+
+### 3.1 Google Gemini API Key
 
 1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
 2. Sign in with your Google account
@@ -99,6 +101,15 @@ This creates:
 4. Copy the API key → `GEMINI_API_KEY`
 
 **Note**: The code will try to use `text-embedding-004` model first, and fallback to `embedding-001` if needed. Both models produce 768-dimensional embeddings, but we're storing them as 1536 in the database schema for future compatibility. If you encounter embedding errors, check which models are available in your Google AI Studio.
+
+### 3.2 MurfAI API Key
+
+1. Go to [MurfAI API Dashboard](https://murf.ai/api)
+2. Sign up or log in to your MurfAI account
+3. Navigate to API settings and create/generate your API key
+4. Copy the API key → `MURF_API_KEY`
+
+**Note**: MurfAI is used for high-quality text-to-speech generation for the AI Manager's voice. The API key is stored securely on the server-side only.
 
 ## Step 4: Configure Environment Variables
 
@@ -115,6 +126,7 @@ NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
 GEMINI_API_KEY=your_gemini_api_key_here
+MURF_API_KEY=your_murf_api_key_here
 ```
 
 **Important**: Never commit `.env.local` to git (it's already in `.gitignore`)
