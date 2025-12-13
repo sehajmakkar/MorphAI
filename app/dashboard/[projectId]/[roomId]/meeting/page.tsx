@@ -29,6 +29,9 @@ export default function MeetingPage() {
   const [loading, setLoading] = useState(true);
   const [turnCount, setTurnCount] = useState(0);
   const [isLoadingAI, setIsLoadingAI] = useState(false);
+  const [initialHistoryMessageIds, setInitialHistoryMessageIds] = useState<
+    Set<string>
+  >(new Set());
 
   useEffect(() => {
     fetchRoomInfo();
@@ -63,6 +66,8 @@ export default function MeetingPage() {
         timestamp: new Date(conv.created_at),
       }));
       setMessages(history);
+      // Track initial history message IDs to distinguish from new messages
+      setInitialHistoryMessageIds(new Set(history.map((m) => m.id)));
     }
     setLoading(false);
   };
@@ -305,6 +310,9 @@ export default function MeetingPage() {
                 .filter((m) => m.role === "assistant")
                 .map((message, index, filteredMessages) => {
                   const isLatest = index === filteredMessages.length - 1;
+                  // Only auto-play if this is the latest message AND it's not from initial history
+                  const shouldAutoPlay =
+                    isLatest && !initialHistoryMessageIds.has(message.id);
                   return (
                     <div
                       key={message.id}
@@ -316,6 +324,7 @@ export default function MeetingPage() {
                           text={message.content}
                           isSpeaking={isAISpeaking}
                           onSpeakingChange={setIsAISpeaking}
+                          autoPlay={shouldAutoPlay}
                         />
                       )}
                     </div>

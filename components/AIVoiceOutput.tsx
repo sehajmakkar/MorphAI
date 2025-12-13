@@ -6,12 +6,14 @@ interface AIVoiceOutputProps {
   text: string;
   isSpeaking: boolean;
   onSpeakingChange: (speaking: boolean) => void;
+  autoPlay?: boolean; // If false, component will not automatically speak on mount/update
 }
 
 export default function AIVoiceOutput({
   text,
   isSpeaking,
   onSpeakingChange,
+  autoPlay = false, // Default to false to prevent auto-playing historical messages
 }: AIVoiceOutputProps) {
   const [currentText, setCurrentText] = useState("");
   const [isSupported, setIsSupported] = useState(false);
@@ -26,7 +28,7 @@ export default function AIVoiceOutput({
   }, []);
 
   useEffect(() => {
-    if (!text || !isSupported || !synthRef.current) return;
+    if (!text || !isSupported || !synthRef.current || !autoPlay) return;
 
     // Cancel any ongoing speech
     if (synthRef.current.speaking) {
@@ -73,7 +75,7 @@ export default function AIVoiceOutput({
         synthRef.current.cancel();
       }
     };
-  }, [text, isSupported, onSpeakingChange]);
+  }, [text, isSupported, onSpeakingChange, autoPlay]);
 
   // Load voices when they become available
   useEffect(() => {

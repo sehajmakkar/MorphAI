@@ -16,6 +16,7 @@ export default function VoiceControls({
   const [isSupported, setIsSupported] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const isListeningRef = useRef<boolean>(false);
 
   useEffect(() => {
     // Check if browser supports Web Speech API
@@ -77,7 +78,8 @@ export default function VoiceControls({
     recognition.onend = () => {
       onListeningChange(false);
       // Restart if it was listening (continuous mode)
-      if (isListening) {
+      // Use ref to avoid stale closure issue
+      if (isListeningRef.current) {
         try {
           recognition.start();
         } catch (e) {
@@ -94,6 +96,11 @@ export default function VoiceControls({
       }
     };
   }, []);
+
+  // Keep ref in sync with isListening prop
+  useEffect(() => {
+    isListeningRef.current = isListening;
+  }, [isListening]);
 
   useEffect(() => {
     if (!recognitionRef.current || !isSupported) return;
