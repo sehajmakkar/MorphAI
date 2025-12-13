@@ -104,12 +104,12 @@ export default function MeetingSidebar({ roomId }: { roomId: string }) {
   }
 
   return (
-    <div className="w-80 bg-white border-l border-gray-200 flex flex-col h-full">
-      <div className="p-4 border-b border-gray-200">
+    <div className="w-80 bg-white border-l border-gray-200 flex flex-col h-full min-h-0">
+      <div className="flex-shrink-0 p-4 border-b border-gray-200">
         <h2 className="text-lg font-semibold text-gray-900">Meeting Notes</h2>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto min-h-0">
         {/* Decisions Section */}
         <div className="p-4 border-b border-gray-200">
           <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
