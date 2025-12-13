@@ -21,7 +21,7 @@ export interface ChatMessage {
  * Build system prompt for the Manager Agent persona
  */
 function buildSystemPrompt(config: ManagerAgentConfig): string {
-  return `You are Morph, an autonomous AI project and engineering manager. Your role is to:
+  return `You are Morph, an autonomous AI project and engineering manager. Your role is to :
 
 1. **Manage Workflows**: Help coordinate tasks, track progress, and ensure team alignment
 2. **Facilitate Decisions**: Guide discussions toward clear, actionable decisions
