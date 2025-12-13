@@ -93,27 +93,6 @@ export default function AIVoiceOutput({
     synthRef.current.onvoiceschanged = loadVoices;
   }, []);
 
-  return (
-    <div className="relative">
-      {isSpeaking && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="flex space-x-1">
-            {[0, 1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="w-2 h-8 bg-indigo-500 rounded-full animate-pulse"
-                style={{
-                  animationDelay: `${i * 0.1}s`,
-                  animationDuration: "0.6s",
-                }}
-              ></div>
-            ))}
-          </div>
-        </div>
-      )}
-      {currentText && (
-        <div className="text-gray-700 text-sm opacity-75">{currentText}</div>
-      )}
-    </div>
-  );
+  // Component only handles audio, no visual output
+  return null;
 }

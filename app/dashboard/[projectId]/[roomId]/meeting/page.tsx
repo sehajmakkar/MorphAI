@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import MeetingSidebar from "@/components/MeetingSidebar";
 import VoiceControls from "@/components/VoiceControls";
 import AIVoiceOutput from "@/components/AIVoiceOutput";
+import RobotIcon from "@/components/RobotIcon";
 
 interface Message {
   id: string;
@@ -101,10 +102,12 @@ export default function MeetingPage() {
     // Get AI response using real AI integration
     setIsLoadingAI(true);
     try {
+      // Calculate new turn count but don't update state until API succeeds
       const newTurnCount = turnCount + 1;
-      setTurnCount(newTurnCount);
-
       const aiResponse = await getAIResponse(text, newTurnCount);
+
+      // Only increment turnCount after successful AI response
+      setTurnCount(newTurnCount);
 
       // Add AI message to UI
       const aiMessage: Message = {
@@ -134,6 +137,7 @@ export default function MeetingPage() {
     } catch (error: any) {
       console.error("Error getting AI response:", error);
       // Show error message to user
+      // Note: turnCount is NOT incremented on error, so failed requests don't advance the counter
       const errorMessage: Message = {
         id: `error-${Date.now()}`,
         role: "assistant",
@@ -177,9 +181,9 @@ export default function MeetingPage() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
+    <div className="h-screen flex flex-col bg-gray-50 overflow-hidden">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="flex-shrink-0 bg-white border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
             <button
@@ -214,10 +218,10 @@ export default function MeetingPage() {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden min-h-0">
         {/* Left Panel - Developer View */}
-        <div className="flex-1 flex flex-col bg-white border-r border-gray-200">
-          <div className="p-6 border-b border-gray-200">
+        <div className="flex-1 flex flex-col bg-white border-r border-gray-200 min-w-0">
+          <div className="flex-shrink-0 p-6 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">
               Developer View
             </h2>
@@ -226,7 +230,7 @@ export default function MeetingPage() {
             </p>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex-1 overflow-y-auto p-6 min-h-0">
             {loading ? (
               <div className="flex items-center justify-center h-full">
                 <p className="text-gray-500">Loading conversation...</p>
@@ -271,79 +275,58 @@ export default function MeetingPage() {
                     </div>
                   </div>
                 ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Right Panel - AI Manager View */}
-        <div className="flex-1 flex flex-col bg-gradient-to-br from-indigo-50 to-purple-50">
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900">
-                  AI Manager
-                </h2>
-                <p className="text-sm text-gray-600">Morph Assistant</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex-1 overflow-y-auto p-6">
-            <div className="space-y-4">
-              {messages
-                .filter((m) => m.role === "assistant")
-                .map((message, index, filteredMessages) => {
-                  const isLatest = index === filteredMessages.length - 1;
-                  // Only auto-play if this is the latest message AND it's not from initial history
-                  const shouldAutoPlay =
-                    isLatest && !initialHistoryMessageIds.has(message.id);
-                  return (
-                    <div
-                      key={message.id}
-                      className="bg-white rounded-lg p-4 shadow-sm"
-                    >
-                      <p className="text-gray-900 mb-2">{message.content}</p>
-                      {isLatest && (
+                {/* Auto-play AI voice for latest message */}
+                {messages
+                  .filter((m) => m.role === "assistant")
+                  .map((message, index, filteredMessages) => {
+                    const isLatest = index === filteredMessages.length - 1;
+                    const shouldAutoPlay =
+                      isLatest && !initialHistoryMessageIds.has(message.id);
+                    return (
+                      isLatest && (
                         <AIVoiceOutput
+                          key={`voice-${message.id}`}
                           text={message.content}
                           isSpeaking={isAISpeaking}
                           onSpeakingChange={setIsAISpeaking}
                           autoPlay={shouldAutoPlay}
                         />
-                      )}
-                    </div>
-                  );
-                })}
-            </div>
+                      )
+                    );
+                  })}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right Panel - Robot Icon View */}
+        <div className="flex-1 flex flex-col bg-gradient-to-br from-indigo-50 to-purple-50 min-w-0">
+          <div className="flex-shrink-0 p-6 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900">
+              AI Assistant
+            </h2>
+            <p className="text-sm text-gray-600">Morph Assistant</p>
+          </div>
+
+          <div className="flex-1 flex items-center justify-center p-6 min-h-0">
+            <RobotIcon isSpeaking={isAISpeaking} />
           </div>
         </div>
 
         {/* Right Sidebar - Tasks and Decisions */}
-        <MeetingSidebar roomId={roomId} />
+        <div className="flex-shrink-0">
+          <MeetingSidebar roomId={roomId} />
+        </div>
       </div>
 
       {/* Bottom Voice Controls */}
-      <VoiceControls
-        onTranscript={handleTranscript}
-        isListening={isListening}
-        onListeningChange={setIsListening}
-      />
+      <div className="flex-shrink-0">
+        <VoiceControls
+          onTranscript={handleTranscript}
+          isListening={isListening}
+          onListeningChange={setIsListening}
+        />
+      </div>
     </div>
   );
 }
