@@ -228,7 +228,7 @@
 
 ## Key Technical Decisions
 
-- **Voice**: Use Web Speech API for MVP (can upgrade to WebRTC/third-party later)
+- **Voice**: Use MurfAI TTS for high-quality AI Manager voice output
 - **Vector Store**: Supabase pgvector (1536-dim embeddings from Gemini)
 - **Real-time**: Supabase Realtime subscriptions for live updates
 - **Edge Runtime**: Use for AI API routes to reduce latency
@@ -242,6 +242,7 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 GEMINI_API_KEY=
+MURF_API_KEY=
 OUMI_API_KEY= (to be researched)
 KESTRA_URL=
 KESTRA_API_KEY= (to be researched)
